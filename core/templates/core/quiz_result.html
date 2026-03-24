@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-lg border-0 rounded-4 p-5 text-center mx-auto" style="max-width: 600px;">
+    <h2 class="fw-bold text-success mb-3">
+      <i class="fa-solid fa-check-circle"></i> Quiz Completed!
+    </h2>
+
+    <p class="fs-5 mt-3">
+      <strong>{{ attempt.quiz.title }}</strong>
+    </p>
+
+    <hr class="my-4">
+
+    <p class="fs-5">
+      Score: <strong>{{ attempt.score }}</strong> / {{ attempt.quiz.questions.count }}
+    </p>
+
+    <p class="fs-5">
+      Percentage: <strong>{{ percentage|floatformat:2 }}%</strong>
+    </p>
+
+    {% if percentage >= 50 %}
+      <div class="alert alert-success mt-4">
+        🎉 Congratulations! You passed the quiz.
+      </div>
+      <a href="{% url 'core:generate_certificate' attempt.quiz.course.id %}" class="btn btn-success mt-3 px-4 py-2 rounded-pill">
+        <i class="fa-solid fa-award"></i> Download Certificate
+      </a>
+    {% else %}
+      <div class="alert alert-warning mt-4">
+        ⚠️ You need at least <strong>50%</strong> to earn a certificate. Try again!
+      </div>
+      <a href="{% url 'core:course_detail' attempt.quiz.course.slug %}" class="btn btn-outline-primary mt-3 px-4 py-2 rounded-pill">
+        <i class="fa-solid fa-rotate-left"></i> Retake Quiz
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

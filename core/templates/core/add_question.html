@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <!-- Header -->
+    <div class="card-header text-white text-center py-3"
+         style="background: linear-gradient(135deg, #4e54c8, #8f94fb); border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+      <h3 class="fw-bold mb-0">
+        <i class="fa-solid fa-circle-question me-2"></i>
+        Add Question to "{{ quiz.title }}"
+      </h3>
+    </div>
+
+    <!-- Form Body -->
+    <div class="card-body p-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <!-- Question Text -->
+        <div class="mb-4">
+          <label for="question_text" class="form-label fw-semibold">Question Text</label>
+          <textarea id="question_text" name="question_text" class="form-control" rows="3" placeholder="Enter the question..." required></textarea>
+        </div>
+
+        <!-- Options -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="option1" class="form-label fw-semibold">Option 1</label>
+            <input type="text" id="option1" name="option1" class="form-control" placeholder="Enter first option" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="option2" class="form-label fw-semibold">Option 2</label>
+            <input type="text" id="option2" name="option2" class="form-control" placeholder="Enter second option" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="option3" class="form-label fw-semibold">Option 3</label>
+            <input type="text" id="option3" name="option3" class="form-control" placeholder="Enter third option" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="option4" class="form-label fw-semibold">Option 4</label>
+            <input type="text" id="option4" name="option4" class="form-control" placeholder="Enter fourth option" required>
+          </div>
+        </div>
+
+        <!-- Correct Option -->
+        <div class="mb-4">
+          <label for="correct_option" class="form-label fw-semibold">Correct Option</label>
+          <select id="correct_option" name="correct_option" class="form-select" required>
+            <option value="">Select Correct Option</option>
+            <option value="1">Option 1</option>
+            <option value="2">Option 2</option>
+            <option value="3">Option 3</option>
+            <option value="4">Option 4</option>
+          </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-custom px-4 py-2 me-2">
+            <i class="fa-solid fa-plus-circle me-2"></i> Add Question
+          </button>
+          <a href="{% url 'core:view_quiz_questions' quiz.id %}" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Styling for Inputs -->
+<style>
+  form input, form textarea, form select {
+    border-radius: 10px !important;
+    border: 1px solid #ccc !important;
+    padding: 10px !important;
+  }
+
+  form input:focus, form textarea:focus, form select:focus {
+    border-color: #4e54c8 !important;
+    box-shadow: 0 0 0 0.15rem rgba(78, 84, 200, 0.25);
+    outline: none;
+  }
+
+  @media (max-width: 768px) {
+    .card {
+      margin: 10px;
+    }
+    button {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
+</style>
+
+{% endblock %}

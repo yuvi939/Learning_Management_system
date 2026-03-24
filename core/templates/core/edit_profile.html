@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+  <div class="card shadow-lg border-0 rounded-4 p-4 mx-auto" style="max-width: 600px;">
+    
+    <!-- 🧑‍🎓 Page Title -->
+    <h3 class="fw-bold text-center mb-4 text-primary">
+      <i class="fa-solid fa-user-pen me-2"></i> Edit Profile
+    </h3>
+
+    <!-- 📝 Edit Profile Form -->
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Profile Image -->
+      <div class="text-center mb-4">
+        {% if user.profile.avatar %}
+          <img 
+            src="{{ user.profile.avatar.url }}" 
+            alt="Profile Picture"
+            class="rounded-circle shadow mb-2" 
+            width="110" 
+            height="110"
+            style="object-fit: cover;"
+          >
+        {% else %}
+          <img 
+            src="https://ui-avatars.com/api/?name={{ user.username }}&background=4e54c8&color=fff&size=110"
+            alt="Default Avatar"
+            class="rounded-circle shadow mb-2"
+          >
+        {% endif %}
+        <p class="text-muted small mb-0">Click below to change your profile picture</p>
+      </div>
+
+      <!-- Avatar Upload -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Profile Picture</label>
+        <input type="file" name="avatar" class="form-control">
+      </div>
+
+      <!-- Username -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Username</label>
+        <input 
+          type="text" 
+          name="username" 
+          value="{{ user.username }}" 
+          class="form-control" 
+          required
+        >
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Email</label>
+        <input 
+          type="email" 
+          name="email" 
+          value="{{ user.email }}" 
+          class="form-control" 
+          required
+        >
+      </div>
+
+      <!-- Role Selection -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Role</label>
+        <select name="is_instructor" class="form-select">
+          <option value="False" {% if not user.profile.is_instructor %}selected{% endif %}>Student</option>
+          <option value="True" {% if user.profile.is_instructor %}selected{% endif %}>Instructor</option>
+        </select>
+      </div>
+
+      <!-- Buttons -->
+      <div class="text-center">
+        <button type="submit" class="btn btn-success rounded-pill px-4 me-2">
+          <i class="fa-solid fa-check me-1"></i> Save Changes
+        </button>
+        <a href="{% url 'core:profile' %}" class="btn btn-secondary rounded-pill px-4">
+          <i class="fa-solid fa-arrow-left me-1"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% if quiz_submissions %}
+  <table class="table table-bordered align-middle">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Quiz</th>
+        <th>Course</th>
+        <th>Score</th>
+        <th>Submitted On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for q in quiz_submissions %}
+      <tr>
+        <td>{{ q.student.username }}</td>
+        <td>{{ q.quiz.title }}</td>
+        <td>{{ q.quiz.course.title }}</td>
+        <td>{{ q.score }} / {{ q.total_marks }}</td>
+        <td>{{ q.submitted_at|date:"M d, Y H:i" }}</td>
+        <td>
+          <a href="{% url 'core:view_quiz_submission' q.id %}" class="btn btn-outline-info btn-sm">
+            <i class="fa-solid fa-eye"></i> View
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="text-muted">No quiz submissions yet.</p>
+{% endif %}

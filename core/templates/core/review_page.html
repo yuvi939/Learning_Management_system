@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container my-5" style="max-width: 800px;">
+  <h2 class="fw-bold text-center mb-4 text-primary">
+    ⭐ Reviews for {{ course.title }}
+  </h2>
+
+  <!-- Review Form -->
+  <div class="card shadow-lg border-0 rounded-4 mb-5">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3"><i class="fa-solid fa-pen"></i> Write a Review</h5>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Rating (1–5)</label>
+          {{ form.rating }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Comment</label>
+          {{ form.comment }}
+        </div>
+        <button type="submit" class="btn btn-primary w-100 rounded-pill">
+          <i class="fa-solid fa-paper-plane"></i> Submit Review
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-comments"></i> What others say</h5>
+
+      {% for r in reviews %}
+        <div class="border-bottom pb-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong class="text-dark">{{ r.user.username }}</strong>
+            <div class="text-warning">
+              {% for i in "12345"|slice:":r.rating" %}⭐{% endfor %}
+            </div>
+          </div>
+          <p class="mt-2 mb-1">{{ r.comment }}</p>
+          <small class="text-muted"><i class="fa-solid fa-calendar"></i> {{ r.created_at|date:"M d, Y" }}</small>
+        </div>
+      {% empty %}
+        <p class="text-muted text-center mt-3">No reviews yet — be the first to share your thoughts!</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

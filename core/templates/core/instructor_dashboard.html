@@ -1,0 +1,452 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<!-- 🌟 Instructor Dashboard Header -->
+<section class="text-white text-center py-5"
+         style="background: linear-gradient(135deg, #4e54c8, #8f94fb); border-radius: 0 0 2rem 2rem;">
+  <div class="container">
+    <h1 class="fw-bold mb-2"><i class="fa-solid fa-chalkboard-user"></i> Instructor Dashboard</h1>
+    <p class="lead mb-4">Manage your courses, lessons, quizzes, assignments, feedback, reviews, and payments.</p>
+    <a href="{% url 'core:create_course' %}" class="btn btn-light btn-lg shadow-sm rounded-pill">
+      <i class="fa-solid fa-circle-plus"></i> Create New Course
+    </a>
+  </div>
+</section>
+
+<div class="container my-5">
+
+  <!-- 🎓 Courses Section -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold"><i class="fa-solid fa-book"></i> Your Courses</h3>
+  </div>
+
+  {% if courses %}
+  <div class="row g-4">
+    {% for c in courses %}
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0 rounded-4">
+
+        {% if c.cover %}
+          <img src="{{ c.cover.url }}" class="card-img-top rounded-top" style="height:180px; object-fit:cover;">
+        {% else %}
+          <img src="https://source.unsplash.com/600x400/?education,learning" class="card-img-top rounded-top" style="height:180px; object-fit:cover;">
+        {% endif %}
+
+        <div class="card-body">
+          <h5 class="fw-bold text-primary">{{ c.title }}</h5>
+          <p class="text-muted small">{{ c.short_description|truncatechars:100 }}</p>
+          <p class="fw-semibold text-success mb-1">₹{{ c.price }}</p>
+          <p class="text-muted small">Published: {{ c.created_at|date:"M d, Y" }}</p>
+        </div>
+
+        <div class="card-footer bg-light border-0 d-flex flex-wrap gap-2">
+          <a href="{% url 'core:edit_course' c.id %}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-pen"></i> Edit</a>
+          <a href="{% url 'core:delete_course' c.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this course?')"><i class="fa-solid fa-trash"></i> Delete</a>
+          <a href="{% url 'core:add_module' c.id %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-folder-plus"></i> Module</a>
+          <a href="{% url 'core:add_lesson' c.id %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-book-open"></i> Lesson</a>
+          <a href="{% url 'core:add_quiz' c.id %}" class="btn btn-outline-info btn-sm"><i class="fa-solid fa-circle-question"></i> Quiz</a>
+          <a href="{% url 'core:add_assignment' c.id %}" class="btn btn-outline-warning btn-sm"><i class="fa-solid fa-file-circle-plus"></i> Assignment</a>
+        </div>
+        <!-- New Manage Buttons -->
+<a href="{% url 'core:edit_lesson' c.id %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-list"></i> Manage Lessons</a>
+<a href="{% url 'core:manage_quizzes' c.id %}" class="btn btn-outline-info btn-sm"><i class="fa-solid fa-circle-question"></i> Manage Quizzes</a>
+<a href="{% url 'core:manage_assignments' c.id %}" class="btn btn-outline-warning btn-sm"><i class="fa-solid fa-file"></i> Manage Assignments</a>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center text-muted my-5">
+    <i class="fa-solid fa-book fa-4x mb-3"></i>
+    <h4>No courses created yet.</h4>
+    <p>Start by creating your first course!</p>
+  </div>
+  {% endif %}
+
+  <hr class="my-5">
+
+  {# Safe quiz attempts link: only render if 'quiz' exists #}
+  {% if quiz %}
+    {% if quiz.id %}
+      <a href="{% url 'view_quiz_attempts' quiz.id %}" class="btn btn-sm btn-primary">Attempts</a>
+    {% else %}
+      <span class="text-muted">Quiz object present but no ID</span>
+    {% endif %}
+  {% else %}
+    <span class="text-muted">No Quiz</span>
+  {% endif %}
+
+
+  <!-- 🧾 Student Submissions -->
+  <section class="mt-4">
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-file-circle-check"></i> Student Submissions</h3>
+    {% if submissions %}
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+      <table class="table table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>Student</th>
+            <th>Assignment</th>
+            <th>Submitted On</th>
+            <th>Grade</th>
+            <th>Feedback</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in submissions %}
+          <tr>
+            <td>
+              {% if s.user %}
+                {{ s.user.username }}
+              {% elif s.student %}
+                {{ s.student.username }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {# Attempt safe access to assignment/quiz field names #}
+              {% if s.assignment %}
+                {{ s.assignment.title }}
+              {% elif s.quiz %}
+                {{ s.quiz.title }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if s.submitted_at %}
+                {{ s.submitted_at|date:"M d, Y H:i" }}
+              {% elif s.created_at %}
+                {{ s.created_at|date:"M d, Y H:i" }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if s.grade %}
+                <span class="badge bg-success">{{ s.grade }}</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% endif %}
+            </td>
+
+            <td>{{ s.feedback|default:"-" }}</td>
+
+            <td>
+              {# safe grade url - assume grade_submission expects submission id #}
+              <a href="{% url 'core:grade_submission' s.id %}" class="btn btn-outline-success btn-sm">
+                <i class="fa-solid fa-marker"></i> Grade
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted">No student submissions yet.</p>
+    {% endif %}
+  </section>
+
+  <hr class="my-5">
+
+  <!-- 🗣 Feedback Management -->
+  <section>
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-comments"></i> Feedback Management</h3>
+    {% if feedbacks %}
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+      <table class="table table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Message</th>
+            <th>Submitted On</th>
+            <th>Reply</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fb in feedbacks %}
+          <tr>
+            <td>
+              {% if fb.user %}
+                {{ fb.user.username }}
+              {% elif fb.student %}
+                {{ fb.student.username }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if fb.course %}
+                {{ fb.course.title }}
+              {% elif fb.course_title %}
+                {{ fb.course_title }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>{{ fb.message|truncatechars:80 }}</td>
+
+            <td>
+              {% if fb.created_at %}
+                {{ fb.created_at|date:"M d, Y H:i" }}
+              {% elif fb.submitted_at %}
+                {{ fb.submitted_at|date:"M d, Y H:i" }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>{{ fb.reply|default:"-" }}</td>
+
+            <td>
+              <a href="{% url 'core:reply_feedback' fb.id %}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-reply"></i> Reply
+              </a>
+              <a href="{% url 'core:delete_feedback' fb.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this feedback?')">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted">No feedback available.</p>
+    {% endif %}
+  </section>
+
+  <hr class="my-5">
+
+  <!-- ⭐ Review Management -->
+  <section>
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-star"></i> Review Management</h3>
+    {% if reviews %}
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+      <table class="table table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Rating</th>
+            <th>Review</th>
+            <th>Submitted On</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reviews %}
+          <tr>
+            <td>
+              {% if r.user %}
+                {{ r.user.username }}
+              {% elif r.student %}
+                {{ r.student.username }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if r.course %}
+                {{ r.course.title }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {# Render stars using forloop.counter which is reliable #}
+              {% for _ in "12345" %}
+                {% if forloop.counter <= r.rating %}
+                  <i class="fa-solid fa-star text-warning"></i>
+                {% else %}
+                  <i class="fa-regular fa-star text-muted"></i>
+                {% endif %}
+              {% endfor %}
+            </td>
+
+            <td>{{ r.comment|truncatechars:100 }}</td>
+            <td>
+              {% if r.created_at %}
+                {{ r.created_at|date:"M d, Y" }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if r.approved %}
+                <span class="badge bg-success">Visible</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% endif %}
+            </td>
+
+            <td>
+              {% if not r.approved %}
+              <a href="{% url 'core:approve_review' r.id %}" class="btn btn-outline-success btn-sm">
+                <i class="fa-solid fa-check"></i> Approve
+              </a>
+              {% endif %}
+              <a href="{% url 'core:delete_review' r.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this review?')">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted">No reviews yet.</p>
+    {% endif %}
+  </section>
+
+  <hr class="my-5">
+
+  <!-- 🎓 Certificate Approvals -->
+  <section>
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-award"></i> Certificate Approvals</h3>
+    {% if enrollments %}
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+      <table class="table table-striped align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in enrollments %}
+          <tr>
+            <td>
+              {% if e.user %}
+                {{ e.user.username }}
+              {% elif e.student %}
+                {{ e.student.username }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if e.course %}
+                {{ e.course.title }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if e.certificate_approved %}
+                <span class="badge bg-success">Approved</span>
+              {% elif e.completed %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% else %}
+                <span class="badge bg-secondary">Incomplete</span>
+              {% endif %}
+            </td>
+
+            <td>
+              {% if not e.certificate_approved and e.completed %}
+                <a href="{% url 'core:approve_certificate' e.id %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-check"></i> Approve</a>
+              {% else %}
+                <button class="btn btn-outline-secondary btn-sm" disabled><i class="fa-solid fa-ban"></i></button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted">No certificate requests yet.</p>
+    {% endif %}
+  </section>
+
+  <hr class="my-5">
+
+  <!-- 💳 Payment Approvals -->
+  <section>
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-credit-card"></i> Payment Approvals</h3>
+    {% if payments %}
+    <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+      <table class="table table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+          <tr>
+            <td>
+              {% if p.user %}
+                {{ p.user.username }}
+              {% elif p.student %}
+                {{ p.student.username }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>
+              {% if p.course %}
+                {{ p.course.title }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+            <td>₹{{ p.amount|default:"0" }}</td>
+
+            <td>
+              {% if p.approved %}
+                <span class="badge bg-success">Approved</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% endif %}
+            </td>
+
+            <td>
+              {% if not p.approved %}
+                <a href="{% url 'core:approve_payment' p.id %}" class="btn btn-outline-success btn-sm">
+    <i class="fa-solid fa-check"></i> Approve
+</a>
+
+              {% else %}
+                <button class="btn btn-outline-secondary btn-sm" disabled><i class="fa-solid fa-check-double"></i></button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted">No payment requests pending.</p>
+    {% endif %}
+  </section>
+
+</div>
+
+{% endblock %}

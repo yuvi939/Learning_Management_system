@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+  <div class="card shadow-lg rounded-4 p-4">
+    <h3 class="text-center mb-4">Login</h3>
+
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" name="username" id="username" placeholder="Enter username" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required>
+      </div>
+
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary rounded-pill">Login</button>
+      </div>
+    </form>
+
+    <p class="text-center mt-3">
+      Don't have an account? <a href="{% url 'core:register' %}">Register here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

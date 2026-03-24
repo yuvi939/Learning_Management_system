@@ -1,0 +1,138 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-5 mb-5">
+  <div class="card shadow-lg border-0 rounded-4 p-4">
+    <h3 class="fw-bold text-center text-primary mb-4">
+      <i class="fa-solid fa-circle-plus"></i> Add New Quiz for {{ course.title }}
+    </h3>
+
+    <form method="post">
+      {% csrf_token %}
+      
+      <!-- Quiz Title -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Quiz Title</label>
+        <input type="text" name="title" class="form-control" placeholder="Enter quiz title" required>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Description</label>
+        <textarea name="description" class="form-control" rows="3" placeholder="Enter quiz description (optional)"></textarea>
+      </div>
+
+      <hr class="my-4">
+      <h5 class="fw-bold text-success mb-3">
+        <i class="fa-solid fa-pen-to-square"></i> Add Questions
+      </h5>
+
+      <div id="question-container"></div>
+
+      <!-- Add Question Button -->
+      <button type="button" id="add-question" class="btn btn-outline-primary w-100 mb-3">
+        <i class="fa-solid fa-plus"></i> Add Another Question
+      </button>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-success w-100">
+        <i class="fa-solid fa-floppy-disk"></i> Create Quiz
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+let counter = 0;
+
+document.getElementById("add-question").addEventListener("click", function () {
+  counter++;
+
+  const container = document.getElementById("question-container");
+  const html = `
+    <div class="question-box p-4 mb-4 rounded-4 shadow-sm bg-light position-relative fade-in">
+
+      <!-- Remove Button -->
+      <button type="button" class="btn btn-sm btn-danger remove-question 
+              position-absolute top-0 end-0 mt-2 me-2 rounded-circle px-2 py-0">
+        ✕
+      </button>
+
+      <h6 class="fw-bold text-primary mb-2">Question ${counter}</h6>
+
+      <input type="text" name="question_text[]" 
+             class="form-control input-soft mb-3" 
+             placeholder="Enter question text" required>
+
+      <div class="row">
+        <div class="col-md-6 mb-2">
+          <input type="text" name="option1[]" class="form-control input-soft" placeholder="Option 1" required>
+        </div>
+        <div class="col-md-6 mb-2">
+          <input type="text" name="option2[]" class="form-control input-soft" placeholder="Option 2" required>
+        </div>
+        <div class="col-md-6 mb-2">
+          <input type="text" name="option3[]" class="form-control input-soft" placeholder="Option 3" required>
+        </div>
+        <div class="col-md-6 mb-2">
+          <input type="text" name="option4[]" class="form-control input-soft" placeholder="Option 4" required>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
+        <select name="correct_option[]" class="form-select input-soft w-50" required>
+          <option value="">Correct Answer</option>
+          <option value="1">Option 1</option>
+          <option value="2">Option 2</option>
+          <option value="3">Option 3</option>
+          <option value="4">Option 4</option>
+        </select>
+
+        <input type="number" name="marks[]" 
+               class="form-control input-soft w-25" placeholder="Marks" 
+               min="1" required>
+      </div>
+
+    </div>
+  `;
+
+  container.insertAdjacentHTML("beforeend", html);
+
+  // Auto scroll to latest added question
+  container.lastElementChild.scrollIntoView({ behavior: "smooth" });
+});
+
+// Remove question using Event Delegation
+document.getElementById("question-container").addEventListener("click", function (e) {
+  if (e.target.classList.contains("remove-question")) {
+    e.target.parentElement.remove();
+  }
+});
+</script>
+
+<style>
+/* Soft fade animation */
+.fade-in {
+  animation: fade 0.3s ease-in-out;
+}
+
+@keyframes fade {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+/* Softer Inputs */
+.input-soft {
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid #cdd6e1 !important;
+}
+.input-soft:focus {
+  border-color: #4b8bfd !important;
+  box-shadow: 0 0 4px rgba(75, 139, 253, 0.4);
+}
+
+/* Remove Button styling */
+.remove-question:hover {
+  background-color: #ff4d4d !important;
+}
+</style>

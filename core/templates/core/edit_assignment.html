@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+  <div class="card shadow-lg border-0 p-4 rounded-4">
+    <h2 class="fw-bold mb-4 text-center text-primary">
+      <i class="fa-solid fa-file-pen"></i> Edit Assignment
+    </h2>
+
+    <!-- Form Start -->
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <!-- Title -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Title</label>
+        <input 
+          type="text" 
+          name="title" 
+          value="{{ assignment.title }}" 
+          class="form-control" 
+          placeholder="Enter assignment title" 
+          required
+        >
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Description</label>
+        <textarea 
+          name="description" 
+          rows="4" 
+          class="form-control" 
+          placeholder="Enter assignment description"
+        >{{ assignment.description }}</textarea>
+      </div>
+
+      <!-- Deadline -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Deadline</label>
+        <input 
+          type="datetime-local" 
+          name="deadline"
+          value="{{ assignment.deadline|date:'Y-m-d\\TH:i' }}" 
+          class="form-control"
+        >
+      </div>
+
+      <!-- Buttons -->
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success px-4">
+          <i class="fa-solid fa-check"></i> Update Assignment
+        </button>
+        <a href="{% url 'core:manage_assignments' assignment.course.id %}" class="btn btn-secondary px-4 ms-2">
+          Cancel
+        </a>
+      </div>
+    </form>
+    <!-- Form End -->
+
+  </div>
+</div>
+
+{% endblock %}

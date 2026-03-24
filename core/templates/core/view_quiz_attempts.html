@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<h2 class="mb-3">Quiz Attempts - {{ quiz.title }}</h2>
+
+{% if attempts %}
+<table class="table table-bordered">
+  <tr>
+    <th>Student</th>
+    <th>Score</th>
+    <th>Date</th>
+  </tr>
+
+  {% for a in attempts %}
+  <tr>
+    <td>{{ a.student.username }}</td>
+    <td>{{ a.score }}%</td>
+    <td>{{ a.completed_at|date:"M d, Y h:i A" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="text-muted">No attempts yet.</p>
+{% endif %}
+
+{% endblock %}

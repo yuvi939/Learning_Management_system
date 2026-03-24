@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-lg border-0 rounded-4 p-4 mx-auto" style="max-width: 700px;">
+
+    <h2 class="fw-bold text-center text-primary mb-3">
+      <i class="fa-solid fa-circle-plus"></i> Create New Course
+    </h2>
+    <p class="text-center text-muted mb-4">
+      Fill in the details below to publish your new course.
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success rounded-pill px-4 me-2">
+          <i class="fa-solid fa-floppy-disk"></i> Save Course
+        </button>
+        <a href="{% url 'core:instructor_dashboard' %}" class="btn btn-secondary rounded-pill px-4">
+          <i class="fa-solid fa-arrow-left"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

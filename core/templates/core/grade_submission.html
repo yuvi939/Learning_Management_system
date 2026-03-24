@@ -1,0 +1,57 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+    <div class="card-header bg-primary text-white text-center py-3">
+      <h3 class="mb-0 fw-bold">
+        <i class="fa-solid fa-pen-to-square me-2"></i> Grade Submission
+      </h3>
+    </div>
+
+    <div class="card-body p-4">
+      <h5 class="fw-bold text-dark">{{ submission.assignment.title }}</h5>
+      <p class="text-muted small mb-4">
+        👩‍🎓 Student: <span class="fw-semibold">{{ submission.student.username }}</span><br>
+        📅 Submitted on: {{ submission.submitted_at|date:"M d, Y h:i A" }}
+      </p>
+
+      {% if submission.submitted_file %}
+        <a href="{{ submission.submitted_file.url }}" target="_blank" class="btn btn-outline-info btn-sm mb-4">
+          <i class="fa-solid fa-file-arrow-down me-1"></i> View Submitted File
+        </a>
+      {% else %}
+        <div class="alert alert-warning py-2">⚠️ No file submitted.</div>
+      {% endif %}
+
+      <form method="post" class="mt-3">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Grade</label>
+          <input 
+            type="text" 
+            name="grade" 
+            value="{{ submission.grade }}" 
+            class="form-control shadow-sm" 
+            placeholder="e.g. A+, 90%" 
+            required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Feedback</label>
+          <textarea 
+            name="feedback" 
+            class="form-control shadow-sm" 
+            rows="4" 
+            placeholder="Write constructive feedback...">{{ submission.feedback }}</textarea>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success fw-semibold py-2">
+            <i class="fa-solid fa-check-circle me-2"></i> Save Grade
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

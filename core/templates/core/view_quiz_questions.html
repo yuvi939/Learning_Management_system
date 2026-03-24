@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+  <h2 class="fw-bold text-center">{{ quiz.title }} - Questions</h2>
+  <p class="text-muted text-center">{{ quiz.description }}</p>
+
+  <div class="text-center mb-3">
+    <a href="{% url 'core:add_question' quiz.id %}" class="btn btn-primary">
+      <i class="fa-solid fa-circle-plus"></i> Add New Question
+    </a>
+  </div>
+
+  {% if questions %}
+    <div class="list-group">
+      {% for q in questions %}
+        <div class="list-group-item">
+          <strong>Q{{ forloop.counter }}:</strong> {{ q.question_text }}
+          <ul class="mt-2">
+            <li>A. {{ q.option1 }}</li>
+            <li>B. {{ q.option2 }}</li>
+            <li>C. {{ q.option3 }}</li>
+            <li>D. {{ q.option4 }}</li>
+          </ul>
+          <p><strong>Correct Answer:</strong> {{ q.correct_option }}</p>
+
+          <div class="mt-2">
+            <a href="{% url 'core:edit_question' q.id %}" class="btn btn-sm btn-outline-success">Edit</a>
+            <a href="{% url 'core:delete_question' q.id %}" class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Delete this question?')">Delete</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center text-muted mt-3">No questions added yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

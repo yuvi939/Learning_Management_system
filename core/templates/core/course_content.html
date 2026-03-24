@@ -1,0 +1,129 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container my-5">
+
+  <!-- 🏫 Course Header -->
+  <div class="card shadow-lg p-4 rounded-4 border-0 mb-4">
+    <h2 class="text-primary fw-bold">{{ course.title }}</h2>
+    <p class="text-muted">{{ course.description|default_if_none:"No description available." }}</p>
+  </div>
+
+  <!-- 🎥 Lessons Section -->
+  <div class="card shadow-sm p-4 rounded-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="text-primary mb-0"><i class="fa-solid fa-video me-2"></i> Lessons</h4>
+    </div>
+    <hr>
+
+    {% if lessons %}
+      <ul class="list-group list-group-flush">
+        {% for l in lessons %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ l.title }}</span>
+
+            {% if l.video %}
+              <a href="{{ l.video.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-play"></i> Watch
+              </a>
+            {% elif l.video_url %}
+              <a href="{{ l.video_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-play"></i> Watch
+              </a>
+            {% else %}
+              <span class="text-muted small">No video available</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No lessons added yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- 🧩 Quizzes Section -->
+  <div class="card shadow-sm p-4 rounded-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="text-warning mb-0"><i class="fa-solid fa-question-circle me-2"></i> Quizzes</h4>
+    </div>
+    <hr>
+
+    {% if quizzes %}
+      <ul class="list-group list-group-flush">
+        {% for q in quizzes %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ q.title }}</span>
+            <a href="{% url 'core:quiz_detail' q.id %}" class="btn btn-outline-warning btn-sm">
+              <i class="fa-solid fa-play"></i> Start Quiz
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No quizzes available.</p>
+    {% endif %}
+  </div>
+
+  <!-- 📝 Assignments Section -->
+  <div class="card shadow-sm p-4 rounded-4 mb-4">
+    <h4 class="text-success mb-3"><i class="fa-solid fa-file-lines me-2"></i> Assignments</h4>
+    <hr>
+
+    {% if assignments %}
+      <ul class="list-group list-group-flush">
+        {% for a in assignments %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ a.title }}</strong><br>
+              <small class="text-muted">Due: {{ a.due_date|date:"M d, Y H:i" }}</small>
+            </div>
+            <a href="{% url 'core:submit_assignment' a.id %}" class="btn btn-outline-success btn-sm">
+              <i class="fa-solid fa-upload"></i> Submit
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No assignments available.</p>
+    {% endif %}
+  </div>
+
+  <!-- 📊 Assignment Results -->
+  <div class="card shadow-sm p-4 rounded-4 mb-4">
+    <h5 class="fw-bold text-secondary">
+      <i class="fa-solid fa-clipboard-check text-success me-2"></i> Assignment Results
+    </h5>
+    <hr>
+
+    {% if user_submissions %}
+      {% for s in user_submissions %}
+        <div class="border rounded p-3 mb-2">
+          <strong>{{ s.assignment.title }}</strong><br>
+
+          {% if s.grade %}
+            <span class="badge bg-success">Grade: {{ s.grade }}</span>
+            {% if s.feedback %}
+              <p class="text-muted small">💬 Feedback: {{ s.feedback }}</p>
+            {% endif %}
+          {% else %}
+            <span class="badge bg-warning text-dark">Pending Review</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">No submissions found.</p>
+    {% endif %}
+  </div>
+
+  <!-- 🎓 Certificate -->
+  <div class="text-center mt-5">
+    <!-- Template -->
+<a href="{% url 'core:download_certificate' course.slug %}" class="btn btn-outline-primary">
+    Download Certificate
+</a>
+
+  </div>
+
+</div>
+
+{% endblock %}

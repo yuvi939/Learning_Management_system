@@ -1,0 +1,228 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<!-- 🌈 Hero Section -->
+<section class="hero-section text-center text-white position-relative overflow-hidden" style="min-height: 90vh; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+
+  <!-- 🎬 Video Background -->
+  <video autoplay muted loop playsinline class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover; z-index: -2;">
+    <source src="{% static 'images/3209298-uhd_3840_2160_25fps.mp4' %}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- 🌈 Gradient Overlay -->
+  <div class="position-absolute top-0 start-0 w-100 h-100" 
+       style="background: linear-gradient(135deg, rgba(106,17,203,0.6), rgba(37,117,252,0.6)); z-index: -1;">
+  </div>
+
+  <!-- ✨ Hero Content -->
+  <div class="container position-relative py-5">
+    <h1 class="fw-bold display-3 mb-3 animate__animated animate__fadeInDown">
+      Welcome to <span class="text-warning">Tech Kida 🎓</span>
+    </h1>
+    <p class="lead mb-4 animate__animated animate__fadeInUp">
+      Learn anything, anytime, anywhere with world-class instructors.
+    </p>
+
+    <!-- 👋 Call to Action Buttons -->
+    {% if not user.is_authenticated %}
+      <a href="{% url 'core:register' %}" class="btn btn-light btn-lg shadow-sm me-2 animate__animated animate__fadeInLeft">Join Free</a>
+      <a href="{% url 'core:login' %}" class="btn btn-outline-light btn-lg shadow-sm animate__animated animate__fadeInRight">Login</a>
+    {% else %}
+      <a href="{% url 'core:course_list' %}" class="btn btn-light btn-lg shadow-sm animate__animated animate__fadeInUp mb-3">Browse Courses</a>
+    {% endif %}
+
+    <!-- 💰 Buy Courses Section (Inside Hero) -->
+    {% if courses %}
+    <div class="mt-4 animate__animated animate__fadeInUp">
+      <h3 class="fw-bold text-warning mb-3">🔥 Enroll Now</h3>
+      <div class="row g-3 justify-content-center">
+        {% for course in courses %}
+          <div class="col-md-3">
+            <div class="card shadow-sm rounded-4 border-0 h-100">
+              {% if course.cover %}
+                <img src="{{ course.cover.url }}" class="card-img-top rounded-top" style="height:150px; object-fit:cover;">
+              {% else %}
+                <img src="https://source.unsplash.com/400x150/?education" class="card-img-top rounded-top">
+              {% endif %}
+              <div class="card-body text-center">
+                <h5 class="fw-semibold">{{ course.title }}</h5>
+                <p class="text-muted small mb-2">₹{{ course.price }}</p>
+                {% if user.is_authenticated %}
+                  <a href="{% url 'core:confirm_payment' course.id %}" class="btn btn-success btn-sm w-100">Buy Now</a>
+                {% else %}
+                  <a href="{% url 'core:login' %}?next={% url 'core:confirm_payment' course.id %}" class="btn btn-warning btn-sm w-100">Login to Buy</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+
+<!-- ✨ Featured Courses Carousel -->
+<section class="mt-5 container">
+  <h2 class="fw-bold mb-4 text-center text-gradient">🌟 Featured Courses</h2>
+  <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for c in newest %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="card border-0 shadow-lg mx-auto" style="max-width: 900px; border-radius:20px;">
+          {% if c.cover %}
+            <img src="{{ c.cover.url }}" class="card-img-top rounded-top" style="height:400px; object-fit:cover;">
+          {% else %}
+            <img src="https://source.unsplash.com/900x400/?study,education" class="card-img-top rounded-top">
+          {% endif %}
+          <div class="card-body text-center">
+            <h4 class="fw-bold">{{ c.title }}</h4>
+            <p class="text-muted">{{ c.short_description|truncatechars:120 }}</p>
+            {% if user.is_authenticated %}
+  <a href="{% url 'core:course_detail' c.slug %}" class="btn btn-outline-primary btn-sm rounded-pill">View</a>
+{% else %}
+  <a href="{% url 'core:login' %}?next={% url 'core:course_detail' c.slug %}" 
+     class="btn btn-outline-warning btn-sm rounded-pill">
+     Login to View
+  </a>
+{% endif %}
+
+          </div>
+        </div>
+      </div>
+      {% empty %}
+        <div class="text-center text-muted">No featured courses yet!</div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</section>
+
+<!-- 💼 Categories Section -->
+<section class="container text-center mt-5">
+  <h2 class="fw-bold mb-4 text-gradient">Top Learning Categories</h2>
+  <div class="row g-4 justify-content-center">
+    {% for cat in categories %}
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-lg h-100 rounded-4 hover-zoom">
+          {% if cat.image %}
+            <img src="{{ cat.image.url }}" class="img-fluid rounded-top" style="height:200px;object-fit:cover;">
+          {% else %}
+            <img src="https://source.unsplash.com/400x300/?{{ cat.name }}" class="img-fluid rounded-top">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="fw-semibold">{{ cat.name }}</h5>
+            <a href="{% url 'core:course_list' %}?category={{ cat.id }}" class="btn btn-outline-primary btn-sm rounded-pill mt-2">Explore</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">No categories found.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- 🔥 Popular Courses -->
+<section class="container mt-5 mb-5">
+  <h3 class="fw-bold mb-4 text-center text-gradient">🔥 Popular Courses</h3>
+  <div class="row g-4">
+    {% for c in newest %}
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-lg rounded-4 hover-shadow">
+        {% if c.cover %}
+          <img src="{{ c.cover.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;">
+        {% else %}
+          <img src="https://source.unsplash.com/600x400/?education,books" class="card-img-top rounded-top">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="fw-bold">{{ c.title }}</h5>
+          <p class="text-muted small">{{ c.short_description|truncatechars:100 }}</p>
+        </div>
+        <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+          <a href="{% url 'core:course_detail' c.slug %}" class="btn btn-outline-primary btn-sm rounded-pill">View</a>
+          <span class="fw-bold text-success">₹{{ c.price }}</span>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-center text-muted">No courses available yet. Stay tuned!</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- 📊 Platform Stats -->
+<section class="stats-section py-5 text-white text-center" style="background: linear-gradient(135deg, #2575fc, #6a11cb);">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-md-4">
+        <h2 class="fw-bold display-6">10K+</h2>
+        <p>Active Students</p>
+      </div>
+      <div class="col-md-4">
+        <h2 class="fw-bold display-6">250+</h2>
+        <p>Expert Instructors</p>
+      </div>
+      <div class="col-md-4">
+        <h2 class="fw-bold display-6">1K+</h2>
+        <p>Available Courses</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- 💌 Feedback Section -->
+<section class="feedback-section bg-light py-5">
+  <div class="container">
+    <h3 class="fw-bold mb-4 text-center text-gradient">💌 Share Your Feedback</h3>
+    <form method="post" class="shadow-lg p-4 rounded-4 bg-white" style="max-width:600px; margin:auto;">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Message</label>
+        <textarea name="message" class="form-control" rows="4" required></textarea>
+      </div>
+      <button class="btn btn-primary w-100 py-2 rounded-pill">Submit Feedback</button>
+    </form>
+  </div>
+</section>
+
+<!-- ✨ Custom CSS Animations -->
+<style>
+.text-gradient {
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  --webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hover-shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+.hover-lift:hover {
+  transform: scale(1.03);
+  transition: all 0.3s ease;
+}
+.hover-zoom img:hover {
+  transform: scale(1.1);
+  transition: transform 0.4s ease;
+}
+</style>
+
+{% endblock %}

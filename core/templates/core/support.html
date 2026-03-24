@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<section class="container py-5">
+  <!-- Header -->
+  <div class="text-center mb-5">
+    <h1 class="fw-bold text-primary display-5">
+      Need Help? 💬
+    </h1>
+    <p class="text-muted">
+      We’re here to assist you! Fill out the form below or reach us directly.
+    </p>
+  </div>
+
+  <!-- ✅ Success / Error Messages -->
+  {% if messages %}
+    <div class="col-md-8 mx-auto mb-4">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Contact Form -->
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+          <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-grid mt-3">
+              <button type="submit" class="btn btn-primary rounded-pill py-2">
+                <i class="fa-solid fa-paper-plane"></i> Send Message
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="text-center mt-4">
+        <p>📧 Email us at:
+          <a href="mailto:support@techkida.com" class="text-primary fw-semibold">support@techkida.com</a>
+        </p>
+        <p>📞 Call us: <strong>+91 98765 43210</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

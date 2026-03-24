@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+  <div class="card shadow-lg border-0 rounded-4 p-4 mx-auto" style="max-width: 700px;">
+    <h3 class="fw-bold text-center mb-4 text-primary">
+      <i class="fa-solid fa-pen-to-square me-2"></i> Edit Question
+    </h3>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- 📝 Question Text -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Question Text</label>
+        <textarea 
+          name="question_text" 
+          rows="3" 
+          class="form-control" 
+          placeholder="Enter the question text..." 
+          required>{{ question.question_text }}</textarea>
+      </div>
+
+      <!-- 🔢 Options -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Option 1</label>
+          <input type="text" name="option1" value="{{ question.option1 }}" class="form-control" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Option 2</label>
+          <input type="text" name="option2" value="{{ question.option2 }}" class="form-control" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Option 3</label>
+          <input type="text" name="option3" value="{{ question.option3 }}" class="form-control" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Option 4</label>
+          <input type="text" name="option4" value="{{ question.option4 }}" class="form-control" required>
+        </div>
+      </div>
+
+      <!-- ✅ Correct Option -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Correct Option (1–4)</label>
+        <input 
+          type="number" 
+          name="correct_option" 
+          class="form-control" 
+          min="1" 
+          max="4" 
+          value="{{ question.correct_option }}" 
+          required>
+        <div class="form-text text-muted">Enter the number (1–4) of the correct option.</div>
+      </div>
+
+      <!-- 🎯 Buttons -->
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success rounded-pill px-4 me-2">
+          <i class="fa-solid fa-check me-1"></i> Update Question
+        </button>
+        <a href="{% url 'core:manage_quiz' question.quiz.id %}" class="btn btn-secondary rounded-pill px-4">
+          <i class="fa-solid fa-arrow-left me-1"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container my-5">
+  
+  <!-- 🔍 Page Heading -->
+  <div class="text-center mb-5">
+    <h2 class="fw-bold display-6 text-primary">
+      <i class="fa-solid fa-graduation-cap"></i> Explore All Courses
+    </h2>
+    <p class="text-muted">Find your perfect course and start learning today!</p>
+  </div>
+
+  <!-- 🔎 Search + Category Filter -->
+  <form method="get" class="mb-5 d-flex flex-wrap justify-content-center align-items-center gap-3">
+    <!-- Search Box -->
+    <div class="input-group shadow" style="max-width: 400px;">
+      <input 
+        type="text" 
+        name="q" 
+        class="form-control form-control-lg" 
+        placeholder="Search for a course..." 
+        value="{{ request.GET.q|default:'' }}"
+      >
+      <button type="submit" class="btn btn-primary btn-lg px-4">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </div>
+
+    <!-- 🏷 Category Filter -->
+    <div>
+      <select 
+        name="category" 
+        class="form-select form-select-lg shadow-sm"
+        onchange="this.form.submit()"
+      >
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+          <option 
+            value="{{ cat.id }}" 
+            {% if cat.id|stringformat:'s' == selected_category|stringformat:'s' %}selected{% endif %}
+          >
+            {{ cat.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <!-- 🎨 Courses Grid -->
+  <div class="row g-4">
+    {% for c in courses %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card course-card h-100 border-0 shadow-sm">
+          
+          <!-- 🖼 Course Image -->
+          <div class="position-relative">
+            {% if c.cover %}
+              <img 
+                src="{{ c.cover.url }}" 
+                alt="{{ c.title }} cover" 
+                class="card-img-top" 
+                style="height: 220px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px;"
+              >
+            {% else %}
+              <img 
+                src="https://source.unsplash.com/600x400/?education,learning" 
+                alt="Default course image" 
+                class="card-img-top" 
+                style="height: 220px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px;"
+              >
+            {% endif %}
+
+            {% if c.published %}
+              <span class="badge bg-success position-absolute top-0 end-0 m-3">Published</span>
+            {% else %}
+              <span class="badge bg-secondary position-absolute top-0 end-0 m-3">Draft</span>
+            {% endif %}
+          </div>
+
+          <!-- 🧾 Course Body -->
+          <div class="card-body">
+            <h5 class="fw-bold text-dark">{{ c.title }}</h5>
+            <p class="text-muted small mb-3">{{ c.short_description|default:"No description available."|truncatechars:100 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-bold text-success fs-6">₹{{ c.price }}</span>
+              <small class="text-muted"><i class="fa-solid fa-user"></i> {{ c.instructor.username }}</small>
+            </div>
+          </div>
+
+          <!-- 🔗 Footer Button -->
+          <div class="card-footer bg-white border-0 text-center pb-4">
+            {% if user.is_authenticated %}
+              <a href="{% url 'core:course_detail' c.slug %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                <i class="fa-solid fa-eye"></i> View Details
+              </a>
+            {% else %}
+              <a href="{% url 'core:login' %}?next={% url 'core:course_detail' c.slug %}" 
+              class="btn btn-primary rounded-pill px-4 py-2">
+              <i class="fa-solid fa-lock"></i> Login to View
+              </a>
+
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center text-muted mt-4">
+        <h5>No courses found matching your search.</h5>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 🧭 Hover Animation -->
+<style>
+  .course-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+  }
+  .course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+{% endblock %}

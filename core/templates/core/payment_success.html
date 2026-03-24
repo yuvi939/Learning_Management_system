@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-lg border-0 text-center p-5 rounded-4" style="max-width: 600px;">
+    
+    <div class="mb-4">
+      <i class="fa-solid fa-circle-check fa-5x text-success"></i>
+    </div>
+
+    <h2 class="fw-bold text-success mb-3">Payment Successful 🎉</h2>
+    <p class="lead text-muted mb-4">
+      You have been successfully enrolled in 
+      <strong class="text-dark">{{ course.title }}</strong>.
+    </p>
+
+    <div class="d-flex justify-content-center gap-3">
+      <a href="{% url 'core:course_detail' course.slug %}" class="btn btn-primary px-4 py-2 rounded-pill">
+        <i class="fa-solid fa-book-open"></i> Go to Course
+      </a>
+      <a href="{% url 'core:course_list' %}" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+        <i class="fa-solid fa-arrow-left"></i> Browse More
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

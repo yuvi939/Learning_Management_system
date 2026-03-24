@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+  <div class="card shadow p-4 rounded-4 border-0">
+    <h3 class="fw-bold text-center text-primary mb-4">
+      📝 Add Assignment to {{ course.title }}
+    </h3>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <!-- Title -->
+      <div class="mb-3">
+        <label for="title" class="form-label fw-semibold">Title</label>
+        <input type="text" id="title" name="title" class="form-control" placeholder="Enter assignment title" required>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label for="description" class="form-label fw-semibold">Description</label>
+        <textarea id="description" name="description" rows="4" class="form-control" placeholder="Write assignment details..." required></textarea>
+      </div>
+
+      <!-- Due Date -->
+      <div class="mb-3">
+        <label for="due_date" class="form-label fw-semibold">Due Date</label>
+        <input type="datetime-local" id="due_date" name="due_date" class="form-control" required>
+      </div>
+
+      <!-- Submit -->
+      <div class="text-center">
+        <button type="submit" class="btn btn-custom px-4 py-2">
+          <i class="fa-solid fa-plus-circle me-2"></i> Add Assignment
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

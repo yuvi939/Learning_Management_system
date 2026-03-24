@@ -1,0 +1,150 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+  <div class="card shadow-lg border-0 rounded-4 p-4 mx-auto" style="max-width: 800px;">
+
+    <!-- ✅ Profile Header -->
+    <div class="text-center position-relative mb-4">
+      {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" alt="Profile Picture"
+             class="rounded-circle shadow" width="120" height="120"
+             style="margin-top: -60px;">
+      {% else %}
+        <img src="{% static 'images/default-avatar.png' %}" alt="Default Avatar"
+             class="rounded-circle shadow" width="120" height="120"
+             style="margin-top: -60px;">
+      {% endif %}
+
+      <div class="mt-2">
+        <h3 class="fw-bold d-inline">{{ user.username }}</h3>
+        {% if user.profile.is_instructor %}
+          <span class="badge ms-2" style="background: linear-gradient(135deg, #4e54c8, #8f94fb); color: #fff;">
+            Instructor
+          </span>
+        {% else %}
+          <span class="badge bg-secondary ms-2">Student</span>
+        {% endif %}
+      </div>
+
+      <p class="text-muted mb-1"><i class="fa-solid fa-envelope"></i> {{ user.email }}</p>
+    </div>
+
+    <!-- ✅ Account Info -->
+    <div>
+      <h5 class="fw-bold text-primary"><i class="fa-solid fa-user-gear"></i> Account Details</h5>
+      <ul class="list-unstyled mt-3">
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>Email:</strong> {{ user.email }}</li>
+        <li><strong>Joined:</strong> {{ user.date_joined|date:"F j, Y" }}</li>
+      </ul>
+    </div>
+
+    {% if user.profile.is_instructor %}
+    <!-- ✅ Instructor Details -->
+    <hr class="my-4">
+    <div>
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-primary"><i class="fa-solid fa-user-tie"></i> Instructor Details</h5>
+        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editInstructorModal">
+          <i class="fa-solid fa-pen-to-square"></i> Edit
+        </button>
+      </div>
+      <ul class="list-unstyled mt-3">
+        <li><strong>Full Name:</strong> {{ user.get_full_name|default:user.username }}</li>
+        <li><strong>Specialization:</strong> {{ user.profile.specialization|default:"Not specified" }}</li>
+        <li><strong>Experience:</strong> {{ user.profile.experience|default:"Not mentioned" }} years</li>
+        <li><strong>Bio:</strong> {{ user.profile.bio|default:"No bio added yet." }}</li>
+        <li><strong>Total Courses:</strong> {{ user.courses.count }}</li>
+      </ul>
+    </div>
+
+    <!-- ✅ Instructor’s Courses -->
+    <hr class="my-4">
+    <div>
+      <h5 class="fw-bold text-success"><i class="fa-solid fa-book-open"></i> My Courses</h5>
+      <div class="row mt-3">
+        {% for course in user.courses.all %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 shadow-sm border-0 rounded-4">
+            {% if course.cover %}
+              <img src="{{ course.cover.url }}" alt="{{ course.title }}"
+                   class="card-img-top rounded-top-4" style="height: 200px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'images/no-image.jpg' %}" alt="No Cover"
+                   class="card-img-top rounded-top-4" style="height: 200px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ course.title }}</h5>
+              <p class="text-muted small flex-grow-1">{{ course.short_description|truncatewords:12 }}</p>
+              <p class="fw-bold mb-2">₹{{ course.price }}</p>
+              {% if course.is_published %}
+                <span class="badge bg-success">Published</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Draft</span>
+              {% endif %}
+            </div>
+            <div class="card-footer bg-white border-0 text-end">
+              <a href="{% url 'core:course_detail' course.slug %}" class="btn btn-outline-primary btn-sm">
+                View
+              </a>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+          <p class="text-muted text-center">You haven’t added any courses yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ✅ Action Buttons -->
+    <div class="text-center mt-4">
+      <a href="{% url 'core:edit_profile' %}" class="btn btn-primary rounded-pill px-4 me-2">
+        <i class="fa-solid fa-user-pen"></i> Edit Profile
+      </a>
+      <a href="{% url 'core:logout' %}" class="btn btn-danger rounded-pill px-4">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ✅ Instructor Edit Modal -->
+<div class="modal fade" id="editInstructorModal" tabindex="-1" aria-labelledby="editInstructorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-lg border-0">
+      <form method="POST" action="{% url 'core:update_instructor_profile' %}">
+        {% csrf_token %}
+        <div class="modal-header bg-primary text-white rounded-top-4">
+          <h5 class="modal-title" id="editInstructorModalLabel">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Instructor Details
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Specialization</label>
+            <input type="text" name="specialization" class="form-control" value="{{ user.profile.specialization }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Experience (in years)</label>
+            <input type="number" name="experience" class="form-control" value="{{ user.profile.experience }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Bio</label>
+            <textarea name="bio" class="form-control" rows="3">{{ user.profile.bio }}</textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary rounded-pill px-4">Save Changes</button>
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
